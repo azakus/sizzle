@@ -239,14 +239,14 @@ function Sizzle( selector, context, results, seed ) {
 		return results;
 	}
 
-	if ( (nodeType = context.nodeType) !== 1 && nodeType !== 9 ) {
+	/*if ( (nodeType = context.nodeType) !== 1 && nodeType !== 9 ) {
 		return [];
-	}
+	}*/
 
 	if ( documentIsHTML && !seed ) {
 
 		// Shortcuts
-		if ( (match = rquickExpr.exec( selector )) ) {
+		if ( false /*(match = rquickExpr.exec( selector )) */) {
 			// Speed-up: Sizzle("#ID")
 			if ( (m = match[1]) ) {
 				if ( nodeType === 9 ) {
@@ -366,12 +366,14 @@ setDocument = Sizzle.setDocument = function( node ) {
 
 	// Check if getElementsByTagName("*") returns only elements
 	support.getElementsByTagName = assert(function( div ) {
+		return false;
 		div.appendChild( doc.createComment("") );
 		return !div.getElementsByTagName("*").length;
 	});
 
 	// Check if attributes should be retrieved by attribute nodes
 	support.attributes = assert(function( div ) {
+		return false;
 		div.innerHTML = "<select></select>";
 		var type = typeof div.lastChild.getAttribute("multiple");
 		// IE8 returns a string for some attributes even when not present
@@ -380,6 +382,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 
 	// Check if getElementsByClassName can be trusted
 	support.getElementsByClassName = assert(function( div ) {
+		return false;
 		// Opera can't find a second classname (in 9.6)
 		div.innerHTML = "<div class='hidden e'></div><div class='hidden'></div>";
 		if ( !div.getElementsByClassName || !div.getElementsByClassName("e").length ) {
@@ -394,6 +397,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 	// Check if getElementsByName privileges form controls or returns elements by ID
 	// If so, assume (for broader support) that getElementById returns elements by name
 	support.getByName = assert(function( div ) {
+		return false;
 		// Inject content
 		div.id = expando + 0;
 		// Support: Windows 8 Native Apps
@@ -477,6 +481,25 @@ setDocument = Sizzle.setDocument = function( node ) {
 		};
 	}
 
+	function matchTag(tag, context) {
+		if (tag === '*') {
+			return true;
+		}
+		if (context.tagName && context.tagName.toLowerCase() === tag.toLowerCase()) {
+			return true;
+		}
+	}
+	function findAll(tag, context, results) {
+		var r = results || [];
+		var c = context.children;
+		if (matchTag(tag, context)) {
+			r.push(context);
+		}
+		for (var i = 0, l = c.length, e; (i < l) && (e = c[i]); i++) {
+			findAll(tag, e, r);
+		}
+		return r;
+	}
 	// Tag
 	Expr.find["TAG"] = support.getElementsByTagName ?
 		function( tag, context ) {
@@ -488,7 +511,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 			var elem,
 				tmp = [],
 				i = 0,
-				results = context.getElementsByTagName( tag );
+				results = findAll(tag, context);
 
 			// Filter out possible comments
 			if ( tag === "*" ) {
@@ -1825,7 +1848,7 @@ function select( selector, context, results, seed ) {
 	var i, tokens, token, type, find,
 		match = tokenize( selector );
 
-	if ( !seed ) {
+	if ( false ) {
 		// Try to minimize operations if there is only one group
 		if ( match.length === 1 ) {
 
