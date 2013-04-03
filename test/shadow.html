@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shadow DOM Polyfill Tests</title>
+  <script src="../sizzle.js"></script>
+  <script src="../node_modules/mocha/mocha.js"></script>
+  <script src="../node_modules/chai/chai.js"></script>
+  <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+  <script src="../../toolkitchen/ShadowDOM/shadowdom.js"></script>
+</head>
+<body>
+  <div id="host"></div>
+  <div class="a" id="id1">
+    <div class="a" id="id2"></div>
+    <div class="b" id="id3">
+      <div class="b" foo="bar" id="id4">
+        <div class="b" id="id5"></div>
+        <span id="span"></span>
+        <div class="a" id="id6"></div>
+      </div>
+    </div>
+  </div>
+  <div id="mocha"></div>
+  <script>
+    function $$(selector, context) {
+      var c = context || ShadowDOMPolyfill.wrap(document);
+      return Sizzle(selector, c);
+    }
+    function $(selector, context) {
+      return $$(selector, context)[0] || null;
+    }
+    function node2id(node) {
+      return node.id;
+    }
+    function eql(selector, expected) {
+      expect($$(selector, SR).map(node2id)).to.eql(expected.split(' '));
+    }
+    var SR = $('#host').createShadowRoot();
+    SR.appendChild($('#id1'));
+    // tests
+    expect = chai.expect;
+    mocha.reporter('html');
+    mocha.setup('tdd');
+
+    suite('Shadow DOM Polyfill', function() {
+      test('QSA on document does not show shadow children', function() {
+        expect($$('div').map(node2id)).to.eql(['host', 'mocha']);
+      });
+      test('QSA on shadow shows shadow children', function() {
+        eql('*', 'id1 id2 id3 id4 id5 span id6');
+      });
+      test('Tag selectors', function() {
+        eql('span', 'span');
+        eql('div', 'id1 id2 id3 id4 id5 id6');
+      });
+      test('Id selectors', function() {
+        eql('#id1', 'id1');
+        eql('#id2', 'id2');
+        eql('#id3', 'id3');
+        eql('#id3', 'id3');
+        eql('#id5', 'id5');
+        eql('#id6', 'id6');
+        eql('#span', 'span');
+      });
+      test('Class selectors', function() {
+        eql('.a', 'id1 id2 id6');
+        eql('.b', 'id3 id4 id5');
+      });
+      test('Attribute Selectors', function() {
+        eql('[foo]', 'id4');
+      });
+    });
+  </script>
+  <script>mocha.run();</script>
+</body>
+</html>
