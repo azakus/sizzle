@@ -34,7 +34,8 @@
       return node.id;
     }
     function eql(selector, expected) {
-      expect($$(selector, SR).map(node2id)).to.eql(expected.split(' '));
+      var expr = expected ? expected.split(' ') : [];
+      expect($$(selector, SR).map(node2id)).to.eql(expr);
     }
     var SR = $('#host').createShadowRoot();
     SR.appendChild($('#id1'));
@@ -70,8 +71,34 @@
       test('Attribute Selectors', function() {
         eql('[foo]', 'id4');
       });
+      test('Sibling Selectors', function() {
+        eql('div + div', 'id3');
+        eql('div ~ div', 'id3 id6');
+      });
+      test('Child Selectors', function() {
+        eql('div > div > div', 'id4 id5 id6');
+        eql('div > span', 'span');
+        eql('.a > .b', 'id3');
+      });
+      test('Descendent Selectors', function() {
+        eql('.a .b', 'id3 id4 id5');
+        eql('div div', 'id2 id3 id4 id5 id6');
+      });
+      test(':not', function() {
+        eql(':not(div)', 'span');
+        eql(':not(.a)', 'id3 id4 id5 span');
+        eql(':not([foo])', 'id1 id2 id3 id5 span id6');
+      });
+      test('child pseudos', function() {
+        eql(':first-child', 'id1 id2 id4 id5');
+        eql(':last-child', 'id1 id3 id4 id6');
+        eql(':first-of-type', 'id1 id2 id4 id5 span');
+        eql(':nth-child(odd)', 'id1 id2 id4 id5 id6');
+        eql(':nth-child(even)', 'id3 span');
+      });
     });
+
+    mocha.run();
   </script>
-  <script>mocha.run();</script>
 </body>
 </html>
