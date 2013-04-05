@@ -1928,6 +1928,14 @@ setDocument();
 [0, 0].sort( sortOrder );
 support.detectDuplicates = hasDuplicate;
 
+// Toolkit compatible API
+Sizzle.localQueryAll = function(inNode, inMatcher) {
+	return Sizzle(inMatcher, inNode);
+};
+Sizzle.localQuery = function(inNode, inMatcher) {
+	return Sizzle.localQueryAll(inNode, inMatcher)[0] || null;
+};
+
 // EXPOSE
 if ( typeof define === "function" && define.amd ) {
 	define(function() { return Sizzle; });

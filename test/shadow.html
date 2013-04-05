@@ -25,10 +25,11 @@
   <script>
     function $$(selector, context) {
       var c = context || ShadowDOMPolyfill.wrap(document);
-      return Sizzle(selector, c);
+      return Sizzle.localQueryAll(c, selector);
     }
     function $(selector, context) {
-      return $$(selector, context)[0] || null;
+      var c = context || ShadowDOMPolyfill.wrap(document);
+      return Sizzle.localQuery(c, selector);
     }
     function node2id(node) {
       return node.id;
